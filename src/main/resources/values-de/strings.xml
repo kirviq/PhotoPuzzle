@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string
+		name="title">PhotoPuzzle</string>
+	<string
+		name="app_name">PhotoPuzzle</string>
+	<string
+		name="dirLabel">Verzeichnis:</string>
+	<string
+		name="chooseDir">Verzeichnis auswählen</string>
+	<string
+		name="difficultyEasy">Leicht</string>
+	<string
+		name="difficultyHard">Schwer</string>
+	<string
+		name="startButton">Start</string>
+	<string
+		name="noDirSelected">keines</string>
+	<string
+		name="images">Bilder</string>
+	<string
+		name="scanningTitle">Suche Bilder</string>
+	<string
+		name="scanningText">Suche Bilder. bitte warten ...</string>
+	<string
+		name="noImagesFound">Es konnten keine Bilder gefunden werden.</string>
+	<string
+		name="chooseDirTitle">Bitte ein Verzeichnis auswählen.</string>
+	<string
+		name="mustChoose">Bitte ein Verzeichnis und einen Schwierigkeitsgrad auswählen.</string>
+	<string
+		name="undoButton">Rückgängig</string>
+	<string
+		name="backButton">Zurück</string>
+	<string
+		name="ok">OK</string>
+	<string
+		name="nextImage">Nächstes</string>
+	<string
+		name="hadEnough">raus hier</string>
+</resources>

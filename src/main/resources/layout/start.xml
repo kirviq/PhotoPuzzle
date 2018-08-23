@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android" 
+	android:layout_height="fill_parent" 
+	android:layout_width="fill_parent" 
+	android:id="@+id/startScreen"
+	>
+	
+	<TextView 
+		android:layout_height="wrap_content" 
+		android:text="@string/title" 
+		android:layout_centerHorizontal="true" 
+		android:textSize="15pt" 
+		android:layout_width="wrap_content" 
+		android:id="@+id/titleLabel" 
+		android:layout_margin="5pt"/>
+	<TextView 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_centerHorizontal="false" 
+		android:layout_below="@id/titleLabel" 
+		android:id="@+id/directoryLabel" 
+		android:layout_alignParentLeft="true" 
+		android:text="@string/dirLabel" 
+		android:layout_margin="5pt" />
+	<TextView 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_centerHorizontal="true" 
+		android:id="@+id/directory" 
+		android:layout_toRightOf="@id/directoryLabel" 
+		android:layout_below="@id/titleLabel" 
+		android:layout_margin="5pt" 
+		android:text="@string/noDirSelected" />
+	<Button 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_centerHorizontal="true" 
+		android:id="@+id/chooseDirButton" 
+		android:layout_below="@id/directory" 
+		android:text="@string/chooseDir" 
+		android:layout_margin="5pt"
+		android:minWidth="60pt" />
+	<RadioGroup 
+		android:layout_centerHorizontal="false" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:id="@+id/difficultyGroup" 
+		android:layout_below="@id/chooseDirButton" 
+		android:layout_margin="5pt">
+		<RadioButton 
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:id="@+id/difficultyEasy" 
+			android:text="@string/difficultyEasy" 
+			android:layout_marginBottom="5pt" />
+		<RadioButton 
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:id="@+id/difficultyHard" 
+			android:text="@string/difficultyHard" />
+	</RadioGroup>
+	<Button 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:id="@+id/startButton" 
+		android:layout_centerHorizontal="true" 
+		android:layout_below="@id/difficultyGroup" 
+		android:text="@string/startButton" 
+		android:layout_margin="5pt" 
+		android:minWidth="60pt" />
+</RelativeLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/undoButton" android:title="@string/undoButton" android:icon="@drawable/ic_menu_revert"></item>
+<item android:id="@+id/nextButton" android:title="@string/nextImage" android:enabled="true" android:icon="@drawable/ic_menu_ff"></item>
+</menu>

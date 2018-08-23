@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:id="@+id/puzzlePage"
+>
+	<TableLayout
+		android:id="@+id/puzzleImage"
+		android:background="#000000"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+	>
+	
+
+</TableLayout>
+<RelativeLayout android:layout_height="fill_parent" android:layout_width="fill_parent" android:layout_margin="4px" android:id="@+id/imageNavOverlay" android:visibility="invisible">
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/hadEnough" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:id="@+id/enoughButton" android:visibility="gone"></Button>
+<ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/nextButton" android:layout_alignParentRight="true" android:layout_alignParentBottom="true" android:src="@drawable/nextbutton" android:clickable="true"></ImageView>
+</RelativeLayout>
+	
+	
+</FrameLayout>
