@@ -22,6 +22,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class Main {
@@ -76,8 +77,8 @@ public class Main {
 	}
 	private static BlockingQueue<Image> getFiles(File baseDir) {
 		List<File> files;
-		try {
-			files = Files.walk((baseDir).toPath(), FileVisitOption.FOLLOW_LINKS)
+		try (Stream<Path> stream = Files.walk((baseDir).toPath(), FileVisitOption.FOLLOW_LINKS)) {
+			files = stream
 					.map(Path::toFile)
 					.filter(File::isFile)
 					.filter(f -> f.getName().matches("(?i).*\\.(jpe?g|png)"))
@@ -99,7 +100,9 @@ public class Main {
 						}
 					});
 			try {
+				//noinspection InfiniteLoopStatement
 				while (true) {
+					// yes, it's not good, but aside from one dead stream per directory reconfiguration it should be ok
 					images.put(new Image(imageWithText("no more images"), false));
 				}
 			} catch (InterruptedException e) {
