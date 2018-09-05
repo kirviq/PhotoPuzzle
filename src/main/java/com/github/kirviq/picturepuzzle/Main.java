@@ -2,6 +2,7 @@ package com.github.kirviq.picturepuzzle;
 
 import com.github.kirviq.picturepuzzle.gui.DirectoryPicker;
 import com.github.kirviq.picturepuzzle.gui.Gui;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
@@ -11,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 public class Main {
 	private static final int PREREAD_BUFFER_SIZE = 1;
 	private static File baseDir;
-	private static BlockingQueue<BufferedImage> files;
+	private static BlockingQueue<Image> files;
 
 	public static void main(String[] args) {
 		System.setProperty("awt.useSystemAAFontSettings","on");
@@ -41,21 +43,19 @@ public class Main {
 				.showNext(g -> showNext(files, g))
 				.changeDir(g -> {
 					baseDir = selectInputDir();
+					g.setImage(imageWithText("scanning..."), false);
 					files = getFiles(baseDir);
 					showNext(files, g);
 				})
 				.build();
+		gui.setImage(imageWithText("scanning..."), false);
 		showNext(files, gui);
 	}
 
-	private static void showNext(BlockingQueue<BufferedImage> files, Gui g) {
+	private static void showNext(BlockingQueue<Image> files, Gui g) {
 		try {
-			BufferedImage take = files.take();
-			if (take != null) {
-				g.setImage(take, true);
-			} else {
-				g.setImage(imageWithText("no more images"), true);
-			}
+			Image take = files.take();
+			g.setImage(take.image, take.game);
 		} catch (InterruptedException e) {
 			log.error("interrupted", e);
 		}
@@ -69,10 +69,15 @@ public class Main {
 		return directory;
 	}
 
-	private static BlockingQueue<BufferedImage> getFiles(File baseDir) {
+	@Value
+	private static class Image {
+		private BufferedImage image;
+		private boolean game;
+	}
+	private static BlockingQueue<Image> getFiles(File baseDir) {
 		List<File> files;
 		try {
-			files = Files.walk((baseDir).toPath())
+			files = Files.walk((baseDir).toPath(), FileVisitOption.FOLLOW_LINKS)
 					.map(Path::toFile)
 					.filter(File::isFile)
 					.filter(f -> f.getName().matches("(?i).*\\.(jpe?g|png)"))
@@ -81,20 +86,24 @@ public class Main {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		BlockingQueue<BufferedImage> images = new ArrayBlockingQueue<>(PREREAD_BUFFER_SIZE);
+		BlockingQueue<Image> images = new ArrayBlockingQueue<>(PREREAD_BUFFER_SIZE);
 		new Thread(() -> {
 			files.stream()
 					.map(Main::readImage)
 					.filter(Objects::nonNull)
 					.forEach((e) -> {
 						try {
-							images.put(e);
+							images.put(new Image(e, true));
 						} catch (InterruptedException e1) {
 							log.warn("interrupted");
 						}
 					});
-			while (true) {
-				images.add(null);
+			try {
+				while (true) {
+					images.put(new Image(imageWithText("no more images"), false));
+				}
+			} catch (InterruptedException e) {
+				// jahaa
 			}
 		}).start();
 		return images;
@@ -110,13 +119,13 @@ public class Main {
 	}
 
 	private static BufferedImage imageWithText(String text) {
-		BufferedImage image = new BufferedImage(170, 30, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = image.getGraphics();
 		graphics.setColor(Color.LIGHT_GRAY);
-		graphics.fillRect(0, 0, 200, 50);
+		graphics.fillRect(0, 0, 500, 500);
 		graphics.setColor(Color.BLACK);
-		graphics.setFont(new Font("Arial Black", Font.BOLD, 20));
-		graphics.drawString(text, 10, 25);
+		graphics.setFont(new Font("Arial Black", Font.BOLD, 50));
+		graphics.drawString(text, 50, 200);
 		return image;
 	}
 }
