@@ -43,10 +43,13 @@ public class Main {
 		Gui gui = Gui.builder()
 				.showNext(g -> showNext(files, g))
 				.changeDir(g -> {
-					baseDir = selectInputDir();
-					g.setImage(imageWithText("scanning..."), false);
-					files = getFiles(baseDir);
-					showNext(files, g);
+					File selectedDir = selectInputDir();
+					if (selectedDir != null) {
+						Main.baseDir = selectedDir;
+						g.setImage(imageWithText("scanning..."), false);
+						files = getFiles(Main.baseDir);
+						showNext(files, g);
+					}
 				})
 				.build();
 		gui.setImage(imageWithText("scanning..."), false);
