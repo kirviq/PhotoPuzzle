@@ -61,7 +61,7 @@ class ImagePanel extends JPanel {
 		return left + top * cols;
 	}
 
-	private Set<Field> getAllowedMoves() {
+	private Set<Field> getDirectNeighbors() {
 		int empty = fields.indexOf(null);
 		int row = empty / cols;
 		int col = empty % cols;
@@ -96,11 +96,27 @@ class ImagePanel extends JPanel {
 				if (!enableGame) {
 					return;
 				}
-				int col = (e.getX() * cols + 1)/ getWidth();
-				int row = (e.getY() * rows + 1)/ getHeight();
-				Field click = new Field(col, row);
-				if (getAllowedMoves().contains(click)) {
-					flip(fields.indexOf(null), click.getNum());
+				int clickedColumn = (e.getX() * cols + 1)/ getWidth();
+				int clickedRow = (e.getY() * rows + 1)/ getHeight();
+				Field click = new Field(clickedColumn, clickedRow);
+				int empty = fields.indexOf(null);
+				int emptyRow = empty / cols;
+				int emptyColumn = empty % cols;
+				if (clickedColumn == emptyColumn) {
+					for (int current = emptyRow; current < clickedRow; current++) {
+						flip(new Field(clickedColumn, current + 1).getNum(), new Field(clickedColumn, current).getNum());
+					}
+					for (int current = emptyRow; current > clickedRow; current--) {
+						flip(new Field(clickedColumn, current - 1).getNum(), new Field(clickedColumn, current).getNum());
+					}
+				}
+				if (clickedRow == emptyRow) {
+					for (int current = emptyColumn; current < clickedColumn; current++) {
+						flip(new Field(current + 1, clickedRow).getNum(), new Field(current, clickedRow).getNum());
+					}
+					for (int current = emptyColumn; current > clickedColumn; current--) {
+						flip(new Field(current - 1, clickedRow).getNum(), new Field(current, clickedRow).getNum());
+					}
 				}
 				if (checkIfSolved()) {
 					enableGame = false;
@@ -186,7 +202,7 @@ class ImagePanel extends JPanel {
 			fields.set(fields.size() - 1, null);
 			for (int i = 0; i < 10000; i++) {
 				int empty = fields.indexOf(null);
-				Set<Field> allowed = getAllowedMoves();
+				Set<Field> allowed = getDirectNeighbors();
 				Field move = new ArrayList<>(allowed).get((int) (allowed.size() * Math.random()));
 				flip(empty, move.getNum());
 			}
