@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import java.awt.*;
@@ -15,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +32,7 @@ class ImagePanel extends JPanel {
 	private final DoubleConsumer aspectRateListener;
 
 	private BufferedImage image;
+	private final BufferedImage transparent;
 	private List<Field> fields;
 	private BufferedImage scaledImage;
 	private boolean enableGame = false;
@@ -45,6 +48,10 @@ class ImagePanel extends JPanel {
 		int getNum() {
 			return x + y * cols;
 		}
+		
+		boolean isLast() {
+			return (x == cols - 1) && (y == rows - 1);
+		}
 	}
 
 	private void render(Graphics g, Field source, Field target) {
@@ -52,9 +59,14 @@ class ImagePanel extends JPanel {
 		double h = (double) getHeight() / rows;
 		double x = w * source.x;
 		double y = h * source.y;
-		g.drawImage(scaledImage, (int) (target.x * w), (int) (target.y * h), (int) ((target.x + 1) * w), (int) ((target.y + 1) * h), (int) x, (int) y, (int) (x + w), (int) (y + h), null);
-//			g.drawRect((int) x, (int) y, (int) w, (int) h);
-//			g.drawRect((int) (x + 1), (int) (y + 1), (int) (w - 2), (int) (h - 2));
+		if (source.isLast()) {
+			g.drawImage(transparent,
+					(int) (target.x * w), (int) (target.y * h),
+					(int) ((target.x + 1) * w), (int) ((target.y + 1) * h),
+					0, 0, transparent.getWidth(), transparent.getHeight(), null);
+		} else {
+			g.drawImage(scaledImage, (int) (target.x * w), (int) (target.y * h), (int) ((target.x + 1) * w), (int) ((target.y + 1) * h), (int) x, (int) y, (int) (x + w), (int) (y + h), null);
+		}
 	}
 
 	private int num(int left, int top) {
@@ -62,7 +74,7 @@ class ImagePanel extends JPanel {
 	}
 
 	private Set<Field> getDirectNeighbors() {
-		int empty = fields.indexOf(null);
+		int empty = findEmptyField();
 		int row = empty / cols;
 		int col = empty % cols;
 		Set<Field> available = new HashSet<>();
@@ -81,7 +93,11 @@ class ImagePanel extends JPanel {
 		return available;
 	}
 
+	@SneakyThrows
 	public ImagePanel(DoubleConsumer aspectRateListener) {
+		try (InputStream in = getClass().getResourceAsStream("/drawable/transparent.png")) {
+			this.transparent = ImageIO.read(in);
+		}
 		this.aspectRateListener = aspectRateListener;
 		addComponentListener(new ComponentAdapter() {
 			@Override
@@ -99,7 +115,7 @@ class ImagePanel extends JPanel {
 				int clickedColumn = (e.getX() * cols + 1)/ getWidth();
 				int clickedRow = (e.getY() * rows + 1)/ getHeight();
 				Field click = new Field(clickedColumn, clickedRow);
-				int empty = fields.indexOf(null);
+				int empty = findEmptyField();
 				int emptyRow = empty / cols;
 				int emptyColumn = empty % cols;
 				if (clickedColumn == emptyColumn) {
@@ -128,7 +144,7 @@ class ImagePanel extends JPanel {
 
 	private boolean checkIfSolved() {
 		return IntStream.range(0, fields.size() - 1)
-				.noneMatch(i -> fields.get(i) == null || fields.get(i).i != i);
+				.allMatch(i -> fields.get(i).i == i);
 	}
 
 	private void flip(int i, int j) {
@@ -152,11 +168,7 @@ class ImagePanel extends JPanel {
 			for (int col = 0; col < cols; col++) {
 				for (int row = 0; row < rows; row++) {
 					Field source = fields.get(col + row * cols);
-					if (source != null) {
-						render(g, source, new Field(col, row));
-					} else {
-						render(g, new Field(-1, -1), new Field(col, row));
-					}
+					render(g, source, new Field(col, row));
 				}
 			}
 			for (int col = 0; col < cols; col++) {
@@ -191,6 +203,7 @@ class ImagePanel extends JPanel {
 		this.image = image;
 		determineLayout();
 		scaleToFit();
+		
 		if (play) {
 			fields = new ArrayList<>();
 			int count = 0;
@@ -199,9 +212,8 @@ class ImagePanel extends JPanel {
 					fields.add(new Field(count++, col, row));
 				}
 			}
-			fields.set(fields.size() - 1, null);
 			for (int i = 0; i < 10000; i++) {
-				int empty = fields.indexOf(null);
+				int empty = findEmptyField();
 				Set<Field> allowed = getDirectNeighbors();
 				Field move = new ArrayList<>(allowed).get((int) (allowed.size() * Math.random()));
 				flip(empty, move.getNum());
@@ -210,7 +222,13 @@ class ImagePanel extends JPanel {
 		}
 		repaint();
 	}
-
+	
+	private int findEmptyField() {
+		return IntStream.range(0, fields.size())
+							.filter(j -> fields.get(j).isLast())
+							.findFirst().orElse(-1);
+	}
+	
 	private void determineLayout() {
 		double rate = (double) image.getWidth() / image.getHeight();
 		if (rate > 1.25) {
@@ -272,5 +290,4 @@ class ImagePanel extends JPanel {
 		graphics.drawImage(image, transformation, null);
 		this.scaledImage = result;
 	}
-
 }
