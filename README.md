@@ -1,0 +1,1 @@
+run it (e.g. mvn exec:java -Dexec.mainClass="com.github.kirviq.picturepuzzle.Main"), pick a directory with images in it and solve puzzles.
