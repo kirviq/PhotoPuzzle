@@ -84,7 +84,7 @@ public class Main {
 			files = stream
 					.map(Path::toFile)
 					.filter(File::isFile)
-					.filter(f -> f.getName().matches("(?i).*\\.(jpe?g|png)"))
+					.filter(f -> f.getName().matches("(?i).*\\.(jpe?g|png|gif)"))
 					.collect(Collectors.toList());
 			Collections.shuffle(files);
 		} catch (IOException e) {
