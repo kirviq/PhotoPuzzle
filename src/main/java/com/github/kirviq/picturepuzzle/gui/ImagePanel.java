@@ -3,6 +3,7 @@ package com.github.kirviq.picturepuzzle.gui;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,9 @@ class ImagePanel extends JPanel {
 	private List<Field> fields;
 	private BufferedImage scaledImage;
 	private boolean enableGame = false;
-
+	@Setter
+	private boolean showHelp = false;
+	
 	@AllArgsConstructor
 	@RequiredArgsConstructor
 	@EqualsAndHashCode(of = {"x", "y"})
@@ -66,6 +69,14 @@ class ImagePanel extends JPanel {
 					0, 0, transparent.getWidth(), transparent.getHeight(), null);
 		} else {
 			g.drawImage(scaledImage, (int) (target.x * w), (int) (target.y * h), (int) ((target.x + 1) * w), (int) ((target.y + 1) * h), (int) x, (int) y, (int) (x + w), (int) (y + h), null);
+			if (showHelp) {
+				g.setFont(new Font("Arial", Font.BOLD, 28));
+				g.setColor(Color.BLACK);
+				String text = String.valueOf(source.i + 1);
+				g.drawString(text, (int) (target.x * w + 10), (int) (target.y * h + 26));
+				g.setColor(Color.ORANGE);
+				g.drawString(text, (int) (target.x * w + 10), (int) (target.y * h + 80));
+			}
 		}
 	}
 
@@ -171,6 +182,7 @@ class ImagePanel extends JPanel {
 					render(g, source, new Field(col, row));
 				}
 			}
+			g.setColor(Color.BLACK);
 			for (int col = 0; col < cols; col++) {
 				int x = col * myWidth / cols;
 				g.drawLine(x - 1, 0, x - 1, myHeight);
@@ -190,6 +202,7 @@ class ImagePanel extends JPanel {
 
 	@SneakyThrows
 	void setImage(BufferedImage image, boolean play) {
+		this.showHelp = false;
 		if (SwingUtilities.isEventDispatchThread()) {
 			setImageInternal(image, play);
 		} else {

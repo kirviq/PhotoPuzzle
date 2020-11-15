@@ -34,6 +34,7 @@ public class Gui {
 
 			{ // actions
 				addButton(panel, () -> changeDir.trigger(this), "/drawable/gears.png");
+				addButton(panel, this::triggerHelp, "/drawable/questionmark.png");
 				panel.add(Box.createHorizontalGlue());
 				addButton(panel, () -> showNext.trigger(this), "/drawable/nextbutton.png");
 			}
@@ -68,7 +69,12 @@ public class Gui {
 			frame.setVisible(true);
 		}
 	}
-
+	
+	private void triggerHelp() {
+		imagePanel.setShowHelp(true);
+		imagePanel.repaint();
+	}
+	
 	private void setAspectRate(double rate) {
 		this.aspectRate = rate;
 		Dimension size = frame.getSize();
