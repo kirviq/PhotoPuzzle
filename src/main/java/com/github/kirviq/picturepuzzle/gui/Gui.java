@@ -27,6 +27,7 @@ public class Gui {
 		JPanel root = new JPanel();
 		OverlayLayout layout = new OverlayLayout(root);
 		root.setLayout(layout);
+		this.imagePanel = new ImagePanel(this::setAspectRate);
 
 		{ // panel with buttons
 			Box panel = new Box(BoxLayout.X_AXIS);
@@ -34,7 +35,9 @@ public class Gui {
 
 			{ // actions
 				addButton(panel, () -> changeDir.trigger(this), "/drawable/gears.png");
+				addButton(panel, imagePanel::undo, "/drawable/undo.png");
 				addButton(panel, this::triggerHelp, "/drawable/questionmark.png");
+//				addButton(panel, () -> { }, "/drawable/info.png");
 				panel.add(Box.createHorizontalGlue());
 				addButton(panel, () -> showNext.trigger(this), "/drawable/nextbutton.png");
 			}
@@ -44,7 +47,6 @@ public class Gui {
 			root.setMinimumSize(max(root.getMinimumSize(), panel.getPreferredSize()));
 		}
 		{ // image area
-			imagePanel = new ImagePanel(this::setAspectRate);
 			imagePanel.setAlignmentX(0.5f);
 			imagePanel.setAlignmentY(0f);
 			root.add(imagePanel);

@@ -1,16 +1,10 @@
 package com.github.kirviq.picturepuzzle.gui;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.imageio.ImageIO;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -19,11 +13,25 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.stream.IntStream;
+
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 
 @SuppressWarnings("NonSerializableFieldInSerializableClass") // Why The Fuck are JPanels serializable?
 @Slf4j
@@ -39,6 +47,7 @@ class ImagePanel extends JPanel {
 	private boolean enableGame = false;
 	@Setter
 	private boolean showHelp = false;
+	private final Deque<Move> history = new LinkedList<>();
 	
 	@AllArgsConstructor
 	@RequiredArgsConstructor
@@ -55,6 +64,12 @@ class ImagePanel extends JPanel {
 		boolean isLast() {
 			return (x == cols - 1) && (y == rows - 1);
 		}
+	}
+
+	@Value
+	private static class Move {
+		int field1;
+		int field2;
 	}
 
 	private void render(Graphics g, Field source, Field target) {
@@ -158,7 +173,19 @@ class ImagePanel extends JPanel {
 				.allMatch(i -> fields.get(i).i == i);
 	}
 
+	public int getStepCount() {
+		return history.size();
+	}
+	public void undo() {
+		Move lastMove = history.pop();
+		Field o = fields.get(lastMove.field1);
+		fields.set(lastMove.field1, fields.get(lastMove.field2));
+		fields.set(lastMove.field2, o);
+		repaint();
+	}
+
 	private void flip(int i, int j) {
+		history.push(new Move(i, j));
 		Field o = fields.get(i);
 		fields.set(i, fields.get(j));
 		fields.set(j, o);
@@ -203,6 +230,7 @@ class ImagePanel extends JPanel {
 	@SneakyThrows
 	void setImage(BufferedImage image, boolean play) {
 		this.showHelp = false;
+		history.clear();
 		if (SwingUtilities.isEventDispatchThread()) {
 			setImageInternal(image, play);
 		} else {

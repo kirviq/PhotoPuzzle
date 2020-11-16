@@ -75,8 +75,8 @@ public class Main {
 
 	@Value
 	private static class Image {
-		private BufferedImage image;
-		private boolean game;
+		BufferedImage image;
+		boolean game;
 	}
 	private static BlockingQueue<Image> getFiles(File baseDir) {
 		List<File> files;
@@ -103,7 +103,6 @@ public class Main {
 						}
 					});
 			try {
-				//noinspection InfiniteLoopStatement
 				while (true) {
 					// yes, it's not good, but aside from one dead stream per directory reconfiguration it should be ok
 					images.put(new Image(imageWithText("no more images"), false));
