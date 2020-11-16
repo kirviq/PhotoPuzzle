@@ -6,6 +6,8 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -51,14 +53,19 @@ public class Main {
 						showNext(files, g);
 					}
 				})
+				.showHelp(g -> {
+					JOptionPane.showMessageDialog(null, "File name: " + currentImageFile + "\nUndosteps available: " + g.getUndoStepCount());
+				})
 				.build();
 		gui.setImage(imageWithText("scanning..."), false);
 		showNext(files, gui);
 	}
 
+	private static File currentImageFile;
 	private static void showNext(BlockingQueue<Image> files, Gui g) {
 		try {
 			Image take = files.take();
+			currentImageFile = take.file;
 			g.setImage(take.image, take.game);
 		} catch (InterruptedException e) {
 			log.error("interrupted", e);
@@ -75,6 +82,7 @@ public class Main {
 
 	@Value
 	private static class Image {
+		File file;
 		BufferedImage image;
 		boolean game;
 	}
@@ -97,7 +105,7 @@ public class Main {
 					.filter(Objects::nonNull)
 					.forEach((e) -> {
 						try {
-							images.put(new Image(e, true));
+							images.put(e);
 						} catch (InterruptedException e1) {
 							log.warn("interrupted");
 						}
@@ -105,7 +113,7 @@ public class Main {
 			try {
 				while (true) {
 					// yes, it's not good, but aside from one dead stream per directory reconfiguration it should be ok
-					images.put(new Image(imageWithText("no more images"), false));
+					images.put(new Image(null, imageWithText("no more images"), false));
 				}
 			} catch (InterruptedException e) {
 				// jahaa
@@ -114,9 +122,9 @@ public class Main {
 		return images;
 	}
 
-	private static BufferedImage readImage(File file) {
+	private static Image readImage(File file) {
 		try {
-			return ImageIO.read(file);
+			return file == null ? null : new Image(file, ImageIO.read(file), true);
 		} catch (IOException e) {
 			log.error("trouble reading image", e);
 			return null;

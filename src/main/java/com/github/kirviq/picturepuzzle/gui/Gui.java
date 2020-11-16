@@ -23,7 +23,7 @@ public class Gui {
 	//	private final JLabel messageBar;
 
 	@Builder
-	public Gui(Command showNext, Command changeDir) {
+	public Gui(Command showNext, Command changeDir, Command showHelp) {
 		JPanel root = new JPanel();
 		OverlayLayout layout = new OverlayLayout(root);
 		root.setLayout(layout);
@@ -37,7 +37,7 @@ public class Gui {
 				addButton(panel, () -> changeDir.trigger(this), "/drawable/gears.png");
 				addButton(panel, imagePanel::undo, "/drawable/undo.png");
 				addButton(panel, this::triggerHelp, "/drawable/questionmark.png");
-//				addButton(panel, () -> { }, "/drawable/info.png");
+				addButton(panel, () -> showHelp.trigger(this), "/drawable/info.png");
 				panel.add(Box.createHorizontalGlue());
 				addButton(panel, () -> showNext.trigger(this), "/drawable/nextbutton.png");
 			}
@@ -109,5 +109,9 @@ public class Gui {
 
 	public void setImage(BufferedImage image, boolean play) {
 		imagePanel.setImage(image, play);
+	}
+	
+	public int getUndoStepCount() {
+		return imagePanel.getStepCount();
 	}
 }

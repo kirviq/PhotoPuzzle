@@ -177,6 +177,9 @@ class ImagePanel extends JPanel {
 		return history.size();
 	}
 	public void undo() {
+		if (history.isEmpty()) {
+			return;
+		}
 		Move lastMove = history.pop();
 		Field o = fields.get(lastMove.field1);
 		fields.set(lastMove.field1, fields.get(lastMove.field2));
