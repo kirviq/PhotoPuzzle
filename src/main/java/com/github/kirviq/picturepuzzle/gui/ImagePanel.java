@@ -160,7 +160,7 @@ class ImagePanel extends JPanel {
 						flip(new Field(current - 1, clickedRow).getNum(), new Field(current, clickedRow).getNum());
 					}
 				}
-				if (checkIfSolved()) {
+				if (isSolved()) {
 					enableGame = false;
 				}
 				repaint();
@@ -168,7 +168,7 @@ class ImagePanel extends JPanel {
 		});
 	}
 
-	private boolean checkIfSolved() {
+	public boolean isSolved() {
 		return IntStream.range(0, fields.size() - 1)
 				.allMatch(i -> fields.get(i).i == i);
 	}

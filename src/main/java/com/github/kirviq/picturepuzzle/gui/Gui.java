@@ -39,7 +39,15 @@ public class Gui {
 				addButton(panel, this::triggerHelp, "/drawable/questionmark.png");
 				addButton(panel, () -> showHelp.trigger(this), "/drawable/info.png");
 				panel.add(Box.createHorizontalGlue());
-				addButton(panel, () -> showNext.trigger(this), "/drawable/nextbutton.png");
+				addButton(panel, () -> {
+					if (!imagePanel.isSolved()) {
+						int reallySkip = JOptionPane.showConfirmDialog(root, "Really skip an unfinished puzzle?", "Confirm skip", JOptionPane.YES_NO_OPTION);
+						if (reallySkip > 0) {
+							return;
+						};
+					}
+					showNext.trigger(this);
+				}, "/drawable/nextbutton.png");
 			}
 			panel.setAlignmentY(0f);
 			panel.setAlignmentX(.5f);
